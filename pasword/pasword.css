@@ -1,0 +1,217 @@
+/* --- VARIABLET DHE BAZA --- */
+:root {
+    --primary-color: #2b6cb0;
+    --accent-color: #4299e1;
+    --bg-light: #f7fafc;
+    --transition-speed: 0.3s;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #2d3748;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    overflow-x: hidden; /* Parandalon lëvizjen anësore në telefon */
+}
+
+/* --- NAVBAR --- */
+.navbar-brand span { color: var(--accent-color); }
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.user-avatar:hover { transform: scale(1.05); }
+
+/* --- HERO & CARD --- */
+.hero-section {
+    padding: 80px 0;
+}
+
+.shortener-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: background-color var(--transition-speed);
+}
+
+.form-control-lg {
+    border: 2px solid #edf2f7;
+    border-radius: 12px;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+}
+
+.form-control-lg:focus {
+    border-color: var(--accent-color);
+    box-shadow: none;
+}
+
+/* --- BUTTONS --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* --- REZULTATET --- */
+.result-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid var(--primary-color);
+    animation: slideUp 0.4s ease;
+    transition: background-color var(--transition-speed);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.short-link {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* --- QR & UTILITIES --- */
+#qrcode {
+    padding: 10px;
+    background: white;
+    display: inline-block;
+}
+
+#qrcode img { margin: 0 auto; }
+
+.x-small { font-size: 0.75rem; }
+html { scroll-behavior: smooth; }
+
+/* --- FAQ & ACCORDION --- */
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9ff;
+    color: #0d6efd;
+}
+
+/* --- FOOTER --- */
+footer a.text-primary:hover {
+    color: #0056b3 !important;
+    letter-spacing: 0.5px;
+}
+
+footer .d-flex a {
+    transition: transform 0.3s ease, color 0.3s ease;
+    display: inline-block;
+}
+
+footer .d-flex a:hover {
+    transform: translateY(-3px) scale(1.2);
+}
+
+/* --- DARK MODE RULES --- */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .navbar {
+    background-color: #1e1e1e !important;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode .nav-link, 
+body.dark-mode .text-secondary,
+body.dark-mode .navbar-brand,
+body.dark-mode .accordion-header button {
+    color: #ffffff !important;
+}
+
+body.dark-mode .shortener-card, 
+body.dark-mode .bg-white, 
+body.dark-mode .result-item,
+body.dark-mode .modal-content,
+body.dark-mode .accordion-item,
+body.dark-mode .accordion-button {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .form-control {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .form-control::placeholder { color: #aaa !important; }
+
+body.dark-mode footer {
+    background-color: #1a1d21 !important;
+    border-top: 1px solid #2d3238 !important;
+}
+
+/* --- RESPONSIVE DESIGN (MOBIL & TABLET) --- */
+
+@media (max-width: 992px) {
+    .hero-section { padding: 60px 0; }
+}
+
+@media (max-width: 768px) {
+    .display-4 { font-size: 2.5rem; }
+    
+    .shortener-card {
+        padding: 25px;
+        margin: 0 15px;
+    }
+    
+    .result-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .result-item .d-flex {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-4 { font-size: 2rem; }
+    
+    .lead { font-size: 1rem; }
+
+    .btn-lg {
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    /* Bën që butoni "Shkurto" të zërë gjithë gjerësinë në telefon */
+    #shortenForm .col-md-3 {
+        margin-top: 10px;
+    }
+}
