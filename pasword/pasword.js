@@ -1,55 +1,64 @@
-// --- 1. INITIALIZATION & THEME ---
+// ==========================================
+// 1. STRUKTURA KRYESORE DHE THEMA
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Kontrollo temën menjëherë
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (isDark) {
+    console.log("ShortenIt JS e ngarkuar saktë!");
+
+    // Kontrollo Dark Mode nga memorja
+    if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
-        const icon = document.getElementById('darkModeIcon');
-        if (icon) {
-            icon.classList.replace('fa-moon', 'fa-sun');
-            icon.style.color = "#ffca28";
-        }
+        updateDarkModeIcon(true);
     }
-    
+
     // Ngarko linqet
     const savedLinks = JSON.parse(localStorage.getItem('myShortLinks')) || [];
     savedLinks.forEach(link => addResultToUI(link.original, link.short, false, link.date));
 
-    // Lidhu me eventet
-    setupMobileEvents();
+    // AKTIVIZO EVENTET (Kjo rregullon klikimet)
+    initEventListeners();
 });
 
-// Fix për Dark Mode në telefon
-function setupMobileEvents() {
+function initEventListeners() {
+    // 1. Butoni i Dark Mode
     const dmBtn = document.getElementById('darkModeBtn');
     if (dmBtn) {
-        // Përdorim 'click' por sigurohemi që kapet në çdo pajisje
         dmBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation();
-            toggleDarkMode();
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            updateDarkModeIcon(isDark);
         });
+    }
+
+    // 2. Formulari i Auth (Login/Register)
+    const authForm = document.getElementById('authForm');
+    if (authForm) {
+        authForm.addEventListener('submit', handleAuthSubmit);
+    }
+
+    // 3. Formulari i Shkurtimit
+    const shortenForm = document.getElementById('shortenForm');
+    if (shortenForm) {
+        shortenForm.addEventListener('submit', handleShortenSubmit);
     }
 }
 
-function toggleDarkMode() {
-    const body = document.body;
+function updateDarkModeIcon(isDark) {
     const icon = document.getElementById('darkModeIcon');
-    const isDark = body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', isDark);
-
     if (icon) {
         if (isDark) {
             icon.classList.replace('fa-moon', 'fa-sun');
             icon.style.color = "#ffca28";
         } else {
             icon.classList.replace('fa-sun', 'fa-moon');
-            icon.style.color = ""; 
+            icon.style.color = "";
         }
     }
 }
 
-// --- 2. AUTH LOGIC (FIXED FOR MOBILE) ---
+// ==========================================
+// 2. AUTH LOGIC (LOGIN/REGISTER)
+// ==========================================
 
 function setAuthMode(mode) {
     const title = document.getElementById('authTitle');
@@ -58,62 +67,46 @@ function setAuthMode(mode) {
     const footerText = document.getElementById('authFooterText');
     const regNameInput = document.getElementById('regName');
 
-    // Pastrojmë inputet kur ndërrojmë mode
-    document.getElementById('authForm').reset();
-
     if (mode === 'register') {
         title.innerText = 'Krijo një Llogari të Re';
         nameField.style.display = 'block';
-        regNameInput.setAttribute('required', 'required');
+        if(regNameInput) regNameInput.required = true;
         submitBtn.innerText = 'Krijo Llogarinë';
-        footerText.innerHTML = 'Keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'login\')" class="text-primary fw-bold text-decoration-none">Hyr këtu</a>';
+        footerText.innerHTML = 'Keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'login\')" class="fw-bold text-primary">Hyr këtu</a>';
     } else {
         title.innerText = 'Hyr në Llogari';
         nameField.style.display = 'none';
-        regNameInput.removeAttribute('required');
+        if(regNameInput) regNameInput.required = false;
         submitBtn.innerText = 'Vazhdo';
-        footerText.innerHTML = 'Nuk keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'register\')" class="text-primary fw-bold text-decoration-none">Regjistrohu këtu</a>';
+        footerText.innerHTML = 'Nuk keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'register\')" class="fw-bold text-primary">Regjistrohu këtu</a>';
     }
 }
 
-// Eventi i Submit të Formës
-const authForm = document.getElementById('authForm');
-if(authForm) {
-    authForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('authEmail').value;
-        const nameInput = document.getElementById('regName').value;
-        const submitBtn = document.getElementById('authSubmitBtn');
-        
-        // Emri: nëse është login, merr pjesën para @ të emailit
-        const displayName = nameInput || email.split('@')[0];
+function handleAuthSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const nameInput = document.getElementById('regName').value;
+    const submitBtn = document.getElementById('authSubmitBtn');
 
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Duke u procesuar...';
+    const name = nameInput || email.split('@')[0];
 
-        setTimeout(() => {
-            loginUserUI(displayName, email);
-            
-            // Mbyll modalin në mënyrë të sigurt për telefonin
-            const modalEl = document.getElementById('authModal');
-            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modalInstance.hide();
-            
-            // Reset butonin
-            submitBtn.disabled = false;
-            submitBtn.innerText = nameInput ? 'Krijo Llogarinë' : 'Vazhdo';
-            authForm.reset();
-        }, 1500);
-    });
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Duke u procesuar...';
+
+    setTimeout(() => {
+        loginUserUI(name, email);
+        const modalEl = document.getElementById('authModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInstance.hide();
+        
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Vazhdo";
+    }, 1200);
 }
 
 function loginUserUI(name, email) {
-    const guestZone = document.getElementById('guest-zone');
-    const userZone = document.getElementById('user-zone');
-    
-    if(guestZone) guestZone.setAttribute('style', 'display: none !important');
-    if(userZone) userZone.setAttribute('style', 'display: flex !important');
+    document.getElementById('guest-zone').style.setProperty('display', 'none', 'important');
+    document.getElementById('user-zone').style.setProperty('display', 'flex', 'important');
     
     document.getElementById('logged-user-name').innerText = name;
     document.getElementById('logged-user-email').innerText = email;
@@ -124,29 +117,27 @@ function loginUserUI(name, email) {
     showToast(`Mirëseerdhe, ${name}! 👋`, 'success');
 }
 
-// --- 3. SHKURTIMI & STRUKTURA ---
+// ==========================================
+// 3. SHKURTIMI DHE TOOLS
+// ==========================================
 
-const shortenForm = document.getElementById('shortenForm');
-if(shortenForm) {
-    shortenForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const urlInput = document.getElementById('urlInput');
-        if(!urlInput.value) return;
+function handleShortenSubmit(e) {
+    e.preventDefault();
+    const urlInput = document.getElementById('urlInput');
+    const originalUrl = urlInput.value;
+    const randomCode = Math.random().toString(36).substring(2, 7);
+    const shortUrl = `short.it/${randomCode}`;
+    const currentDate = new Date().toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' });
 
-        const randomCode = Math.random().toString(36).substring(2, 7);
-        const shortUrl = `short.it/${randomCode}`;
-        const currentDate = new Date().toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' });
-
-        addResultToUI(urlInput.value, shortUrl, true, currentDate);
-        saveLinkToStorage(urlInput.value, shortUrl, currentDate);
-        urlInput.value = ''; 
-        showToast("Linku u krijua! ✨", "primary");
-    });
+    addResultToUI(originalUrl, shortUrl, true, currentDate);
+    saveLinkToStorage(originalUrl, shortUrl, currentDate);
+    urlInput.value = ''; 
+    showToast("Linku u gjenerua! ✨", "primary");
 }
 
-function addResultToUI(original, short, animate = false, date = 'Sot') {
+function addResultToUI(original, short, animate, date) {
     const resultsList = document.getElementById('resultsList');
-    if(!resultsList) return;
+    if (!resultsList) return;
 
     const div = document.createElement('div');
     div.className = 'result-item shadow-sm mb-3 d-flex justify-content-between align-items-center p-3 rounded-3 bg-white';
@@ -164,28 +155,20 @@ function addResultToUI(original, short, animate = false, date = 'Sot') {
     resultsList.prepend(div);
 }
 
-// --- UTILS ---
-function showToast(message, type = 'primary') {
+// UTILS
+function showToast(message, type) {
     const toastEl = document.getElementById('liveToast');
-    const toastMsg = document.getElementById('toastMessage');
-    if(!toastEl) return;
+    document.getElementById('toastMessage').innerText = message;
     toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
-    toastMsg.innerText = message;
     bootstrap.Toast.getOrCreateInstance(toastEl).show();
-}
-
-function saveLinkToStorage(original, short, date) {
-    let links = JSON.parse(localStorage.getItem('myShortLinks')) || [];
-    links.push({ original, short, date });
-    localStorage.setItem('myShortLinks', JSON.stringify(links));
 }
 
 function copyToClipboard(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
-        const old = btn.innerHTML;
+        const icon = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i>';
         showToast("U kopjua! ✅", "success");
-        setTimeout(() => btn.innerHTML = old, 2000);
+        setTimeout(() => btn.innerHTML = icon, 2000);
     });
 }
 
@@ -194,6 +177,21 @@ function generateQR(link) {
     qrContainer.innerHTML = "";
     new QRCode(qrContainer, { text: link, width: 180, height: 180 });
     bootstrap.Modal.getOrCreateInstance(document.getElementById('qrModal')).show();
+}
+
+function saveLinkToStorage(original, short, date) {
+    let links = JSON.parse(localStorage.getItem('myShortLinks')) || [];
+    links.push({ original, short, date });
+    localStorage.setItem('myShortLinks', JSON.stringify(links));
+}
+
+function deleteLink(shortUrl, btn) {
+    if(confirm("Fshije këtë link?")) {
+        let links = JSON.parse(localStorage.getItem('myShortLinks')) || [];
+        links = links.filter(l => l.short !== shortUrl);
+        localStorage.setItem('myShortLinks', JSON.stringify(links));
+        btn.closest('.result-item').remove();
+    }
 }
 
 function logoutUser() {
