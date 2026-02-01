@@ -11,11 +11,43 @@ body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     color: #2d3748;
     transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-    overflow-x: hidden; /* Parandalon lëvizjen anësore në telefon */
+    overflow-x: hidden;
 }
 
-/* --- NAVBAR --- */
+/* --- NAVBAR & NAVIGATION --- */
+.navbar {
+    z-index: 1050;
+    transition: background-color 0.3s ease;
+}
+
 .navbar-brand span { color: var(--accent-color); }
+
+.nav-link {
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+/* Rregullim për menunë në telefon */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        margin-top: 15px;
+        padding-bottom: 20px;
+    }
+    .nav-link {
+        padding: 12px 0 !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    #guest-zone {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #guest-zone button {
+        width: 100%;
+    }
+}
 
 .user-avatar {
     width: 40px;
@@ -31,28 +63,25 @@ body {
     transition: transform 0.2s ease;
 }
 
-.user-avatar:hover { transform: scale(1.05); }
+.user-avatar:hover { transform: scale(1.1); }
 
 /* --- HERO & CARD --- */
-.hero-section {
-    padding: 80px 0;
-}
+.hero-section { padding: 60px 0; }
 
 .shortener-card {
     background: white;
     padding: 40px;
     border-radius: 20px;
-    max-width: 900px;
+    max-width: 850px;
     margin: 0 auto;
     border: 1px solid rgba(0,0,0,0.05);
-    transition: background-color var(--transition-speed);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 .form-control-lg {
     border: 2px solid #edf2f7;
     border-radius: 12px;
     padding: 15px 25px;
-    font-size: 1.1rem;
 }
 
 .form-control-lg:focus {
@@ -66,26 +95,27 @@ body {
     border: none;
     border-radius: 12px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    padding: 12px 25px;
 }
 
 .btn-primary:hover {
     background-color: var(--accent-color);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
 }
 
 /* --- REZULTATET --- */
 .result-item {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 15px;
+    padding: 18px;
     margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-left: 5px solid var(--primary-color);
-    animation: slideUp 0.4s ease;
-    transition: background-color var(--transition-speed);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    animation: slideUp 0.4s ease forwards;
 }
 
 @keyframes slideUp {
@@ -93,125 +123,108 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.short-link {
-    color: var(--primary-color);
-    font-weight: bold;
-    text-decoration: none;
+/* --- FAQ / ACCORDION --- */
+.accordion-item {
+    border: none !important;
+    margin-bottom: 10px;
+    border-radius: 12px !important;
 }
 
-/* --- QR & UTILITIES --- */
-#qrcode {
-    padding: 10px;
-    background: white;
-    display: inline-block;
+.accordion-button {
+    border-radius: 12px !important;
+    font-weight: 600;
 }
 
-#qrcode img { margin: 0 auto; }
-
-.x-small { font-size: 0.75rem; }
-html { scroll-behavior: smooth; }
-
-/* --- FAQ & ACCORDION --- */
 .accordion-button:not(.collapsed) {
-    background-color: #f8f9ff;
-    color: #0d6efd;
+    background-color: #ebf4ff;
+    color: var(--primary-color);
 }
 
-/* --- FOOTER --- */
-footer a.text-primary:hover {
-    color: #0056b3 !important;
-    letter-spacing: 0.5px;
+/* --- FOOTER & SOCIALS --- */
+footer {
+    transition: background-color var(--transition-speed);
 }
 
-footer .d-flex a {
-    transition: transform 0.3s ease, color 0.3s ease;
-    display: inline-block;
+footer .fa-brands {
+    transition: all 0.3s ease;
 }
 
-footer .d-flex a:hover {
-    transform: translateY(-3px) scale(1.2);
-}
+footer a:hover .fa-facebook { color: #1877f2; transform: scale(1.2); }
+footer a:hover .fa-linkedin { color: #0a66c2; transform: scale(1.2); }
+footer a:hover .fa-github { color: #333; transform: scale(1.2); }
+footer a:hover .fa-whatsapp { color: #25d366; transform: scale(1.2); }
 
-/* --- DARK MODE RULES --- */
+/* --- DARK MODE --- */
 body.dark-mode {
-    background-color: #121212 !important;
-    color: #ffffff !important;
+    background-color: #0f172a !important; /* Ngjyrë më moderne e errët */
+    color: #f1f5f9 !important;
 }
 
-body.dark-mode .navbar {
-    background-color: #1e1e1e !important;
-    border-bottom: 1px solid #333;
+body.dark-mode .navbar, 
+body.dark-mode .navbar-collapse,
+body.dark-mode .bg-white,
+body.dark-mode footer {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
 
-body.dark-mode .nav-link, 
-body.dark-mode .text-secondary,
-body.dark-mode .navbar-brand,
-body.dark-mode .accordion-header button {
-    color: #ffffff !important;
-}
-
-body.dark-mode .shortener-card, 
-body.dark-mode .bg-white, 
+body.dark-mode .shortener-card,
 body.dark-mode .result-item,
 body.dark-mode .modal-content,
 body.dark-mode .accordion-item,
 body.dark-mode .accordion-button {
-    background-color: #1e1e1e !important;
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .input-group-text {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
     color: #ffffff !important;
-    border: 1px solid #333 !important;
 }
 
-body.dark-mode .form-control {
-    background-color: #2d2d2d !important;
-    border-color: #444 !important;
-    color: #ffffff !important;
+body.dark-mode .nav-link,
+body.dark-mode .text-secondary {
+    color: #cbd5e1 !important;
 }
 
-body.dark-mode .form-control::placeholder { color: #aaa !important; }
-
-body.dark-mode footer {
-    background-color: #1a1d21 !important;
-    border-top: 1px solid #2d3238 !important;
+body.dark-mode .accordion-button:not(.collapsed) {
+    background-color: #334155;
+    color: var(--accent-color);
 }
 
-/* --- RESPONSIVE DESIGN (MOBIL & TABLET) --- */
-
-@media (max-width: 992px) {
-    .hero-section { padding: 60px 0; }
-}
-
+/* --- RESPONSIVE DESIGN (MOBIL) --- */
 @media (max-width: 768px) {
-    .display-4 { font-size: 2.5rem; }
+    .display-4 { font-size: 2rem; }
+    .hero-section { padding: 40px 0; }
     
     .shortener-card {
-        padding: 25px;
+        padding: 20px;
         margin: 0 15px;
     }
     
     .result-item {
         flex-direction: column;
+        gap: 12px;
         text-align: center;
-        gap: 15px;
     }
-
+    
     .result-item .d-flex {
         width: 100%;
         justify-content: center;
     }
 }
 
-@media (max-width: 576px) {
-    .display-4 { font-size: 2rem; }
-    
-    .lead { font-size: 1rem; }
+/* UTILS */
+#qrcode {
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+}
 
-    .btn-lg {
-        padding: 12px;
-        font-size: 1rem;
-    }
-
-    /* Bën që butoni "Shkurto" të zërë gjithë gjerësinë në telefon */
-    #shortenForm .col-md-3 {
-        margin-top: 10px;
-    }
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
 }
