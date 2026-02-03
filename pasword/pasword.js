@@ -2,17 +2,14 @@
 // 1. STRUKTURA DHE TEMA (DARK MODE)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Ngarko temën
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
         updateDarkModeIcon(true);
     }
 
-    // Ngarko linqet e ruajtura
     const savedLinks = JSON.parse(localStorage.getItem('myShortLinks')) || [];
     savedLinks.forEach(link => addResultToUI(link.original, link.short, false, link.date));
 
-    // Kontrollo nëse përdoruesi ishte i kyçur
     const user = JSON.parse(localStorage.getItem('loggedUser'));
     if (user) {
         loginUserUI(user.name, user.email);
@@ -42,20 +39,17 @@ function updateDarkModeIcon(isDark) {
 // 2. NAVIGIMI DHE SEKSIONET
 // ==========================================
 function showSection(sectionName) {
-    // ID-të reale në HTML
     const sections = {
         'hero': 'hero-section',
         'analytics': 'analytics-section',
         'settings': 'settings-section'
     };
     
-    // Fshih të gjitha seksionet
     Object.values(sections).forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.setProperty('display', 'none', 'important');
     });
 
-    // Shfaq seksionin e kërkuar
     const activeId = sections[sectionName];
     const activeSection = document.getElementById(activeId);
     if (activeSection) {
@@ -63,14 +57,12 @@ function showSection(sectionName) {
         window.scrollTo(0, 0);
     }
 
-    // Përditëso të dhënat nëse është Analitika
     if (sectionName === 'analytics') {
         const links = JSON.parse(localStorage.getItem('myShortLinks')) || [];
         const countEl = document.getElementById('active-links-count');
         if (countEl) countEl.innerText = links.length;
     }
 
-    // MBYLL MENUNË NË MOBIL
     const navbarCollapse = document.getElementById('navbarNav');
     if (navbarCollapse && navbarCollapse.classList.contains('show')) {
         const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
@@ -144,7 +136,8 @@ function loginUserUI(name, email) {
     if(settingsEmail) settingsEmail.value = email;
     
     const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-    document.getElementById('user-initials').innerText = initials.substring(0, 2) || "U";
+    const avatarInitials = document.getElementById('user-initials');
+    if(avatarInitials) avatarInitials.innerText = initials.substring(0, 2) || "U";
 }
 
 function logoutUser() {
@@ -155,25 +148,42 @@ function logoutUser() {
 }
 
 // ==========================================
-// 4. SHKURTIMI DHE REZULTATET
+// 4. SHKURTIMI REAL (ME API)
 // ==========================================
 const shortenForm = document.getElementById('shortenForm');
 if(shortenForm) {
-    shortenForm.addEventListener('submit', function(e) {
+    shortenForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const urlInput = document.getElementById('urlInput');
         const originalUrl = urlInput.value;
-        
-        // Gjenero kodin unik
-        const randomCode = Math.random().toString(36).substring(2, 7);
-        const shortUrl = `short.it/${randomCode}`;
-        
-        const currentDate = new Date().toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' });
+        const btn = e.target.querySelector('button');
 
-        addResultToUI(originalUrl, shortUrl, true, currentDate);
-        saveLinkToStorage(originalUrl, shortUrl, currentDate);
-        
-        urlInput.value = ''; 
+        // Loading state
+        const originalBtnText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        try {
+            // Përdorimi i TinyURL API (pa nevojë për çelës publik)
+            const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(originalUrl)}`);
+            
+            if (response.ok) {
+                const shortUrl = await response.text(); 
+                const currentDate = new Date().toLocaleDateString('sq-AL', { day: 'numeric', month: 'short' });
+
+                addResultToUI(originalUrl, shortUrl, true, currentDate);
+                saveLinkToStorage(originalUrl, shortUrl, currentDate);
+            } else {
+                alert("Gabim gjatë shkurtimit. Ju lutem provoni përsëri.");
+            }
+        } catch (error) {
+            console.error("API Error:", error);
+            alert("Lidhja dështoi. Kontrolloni internetin.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnText;
+            urlInput.value = ''; 
+        }
     });
 }
 
@@ -190,10 +200,10 @@ function addResultToUI(original, short, animate, date) {
                 <p class="mb-0 text-truncate small text-secondary" style="max-width: 150px;">${original}</p>
                 <span class="badge bg-light text-dark fw-normal" style="font-size: 0.7rem;">${date || 'Sot'}</span>
             </div>
-            <a href="${original}" target="_blank" class="short-link fs-5 fw-bold text-decoration-none text-primary">${short}</a>
+            <a href="${short}" target="_blank" class="short-link fs-5 fw-bold text-decoration-none text-primary">${short}</a>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-dark" onclick="generateQR('${original}')" title="QR Code"><i class="fa-solid fa-qrcode"></i></button>
+            <button class="btn btn-sm btn-outline-dark" onclick="generateQR('${short}')" title="QR Code"><i class="fa-solid fa-qrcode"></i></button>
             <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${short}', this)" title="Kopjo"><i class="fa-regular fa-copy"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteLink('${short}', this)" title="Fshij"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -245,17 +255,8 @@ function downloadQR() {
     if (qrImg) {
         const link = document.createElement('a');
         link.href = qrImg.src;
-        link.download = 'shortenit-qr.png';
+        link.download = 'qr-code.png';
         link.click();
-    } else {
-        // Për canvas (disa browsera e bëjnë render si canvas)
-        const canvas = document.querySelector('#qrcode canvas');
-        if(canvas) {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL("image/png");
-            link.download = 'shortenit-qr.png';
-            link.click();
-        }
     }
 }
 
