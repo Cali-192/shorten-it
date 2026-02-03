@@ -228,3 +228,20 @@ html {
     scroll-behavior: smooth;
     overflow-x: hidden;
 }
+#user-zone {
+    display: none; /* Do të ndryshohet nga JS me !important */
+}
+
+/* Fix për tekstin në dark mode */
+body.dark-mode .dropdown-menu {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .dropdown-item {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #334155 !important;
+}
