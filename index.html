@@ -44,7 +44,7 @@
                         <button class="btn btn-primary btn-sm fw-600 px-3" data-bs-toggle="modal" data-bs-target="#authModal" onclick="setAuthMode('register')">Regjistrohu</button>
                     </div>
 
-                    <div id="user-zone" style="display: none;">
+                    <div id="user-zone" style="display: none !important;">
                         <div class="dropdown">
                             <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span id="user-initials">U</span>
@@ -54,8 +54,8 @@
                                     <p class="mb-0 small fw-bold" id="logged-user-name">Emri Juaj</p>
                                     <p class="mb-0 x-small text-secondary" id="logged-user-email">email@shembull.com</p>
                                 </li>
-                                <li><a class="dropdown-item mt-2" href="javascript:void(0)" onclick="showSection('analytics')"><i class="fa-solid fa-chart-line me-2"></i> Analitika</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="showSection('settings')"><i class="fa-solid fa-gear me-2"></i> Cilësimet</a></li>
+                                <li><a class="dropdown-item mt-2" href="javascript:void(0)" onclick="showSection('analytics')" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show"><i class="fa-solid fa-chart-line me-2"></i> Analitika</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="showSection('settings')" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show"><i class="fa-solid fa-gear me-2"></i> Cilësimet</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket me-2"></i> Dil</a></li>
                             </ul>
