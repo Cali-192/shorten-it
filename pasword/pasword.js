@@ -283,3 +283,8 @@ function filterLinks() {
         item.style.setProperty('display', text.includes(search) ? 'flex' : 'none', 'important');
     });
 }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
+  });
+}
