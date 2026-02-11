@@ -1,15 +1,16 @@
 {
   "short_name": "ShortenIt",
   "name": "ShortenIt - Shkurto linqet",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/906/906334.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
+"icons": [
+  {
+    "src": "https://cdn-icons-png.flaticon.com/512/1006/1006771.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#0d6efd",
   "background_color": "#ffffff"
 }
+
