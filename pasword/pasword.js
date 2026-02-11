@@ -2,14 +2,17 @@
 // 1. STRUKTURA DHE TEMA (DARK MODE)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Kontrolli i Dark Mode
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
         updateDarkModeIcon(true);
     }
 
+    // Ngarkimi i linqeve të ruajtur
     const savedLinks = JSON.parse(localStorage.getItem('myShortLinks')) || [];
     savedLinks.forEach(link => addResultToUI(link.original, link.short, false, link.date));
 
+    // Kontrolli i përdoruesit të identifikuar
     const user = JSON.parse(localStorage.getItem('loggedUser'));
     if (user) {
         loginUserUI(user.name, user.email);
@@ -54,15 +57,17 @@ function showSection(sectionName) {
     const activeSection = document.getElementById(activeId);
     if (activeSection) {
         activeSection.style.setProperty('display', 'block', 'important');
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Përditëso analitikën në kohë reale
     if (sectionName === 'analytics') {
         const links = JSON.parse(localStorage.getItem('myShortLinks')) || [];
         const countEl = document.getElementById('active-links-count');
         if (countEl) countEl.innerText = links.length;
     }
 
+    // Mbyll menunë mobile pas klikimit
     const navbarCollapse = document.getElementById('navbarNav');
     if (navbarCollapse && navbarCollapse.classList.contains('show')) {
         const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
@@ -83,12 +88,12 @@ function setAuthMode(mode) {
         title.innerText = 'Krijo një Llogari të Re';
         nameField.style.display = 'block';
         submitBtn.innerText = 'Krijo Llogarinë';
-        footerText.innerHTML = 'Keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'login\')" class="text-primary fw-bold">Hyr këtu</a>';
+        footerText.innerHTML = 'Keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'login\')" class="text-primary fw-bold text-decoration-none">Hyr këtu</a>';
     } else {
         title.innerText = 'Hyr në Llogari';
         nameField.style.display = 'none';
         submitBtn.innerText = 'Vazhdo';
-        footerText.innerHTML = 'Nuk keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'register\')" class="text-primary fw-bold">Regjistrohu këtu</a>';
+        footerText.innerHTML = 'Nuk keni llogari? <a href="javascript:void(0)" onclick="setAuthMode(\'register\')" class="text-primary fw-bold text-decoration-none">Regjistrohu këtu</a>';
     }
 }
 
@@ -127,8 +132,10 @@ function loginUserUI(name, email) {
     if(guestZone) guestZone.style.setProperty('display', 'none', 'important');
     if(userZone) userZone.style.setProperty('display', 'block', 'important');
     
-    document.getElementById('logged-user-name').innerText = name;
-    document.getElementById('logged-user-email').innerText = email;
+    const nameEl = document.getElementById('logged-user-name');
+    const emailEl = document.getElementById('logged-user-email');
+    if(nameEl) nameEl.innerText = name;
+    if(emailEl) emailEl.innerText = email;
     
     const settingsName = document.getElementById('settingsName');
     const settingsEmail = document.getElementById('settingsEmail');
@@ -155,8 +162,10 @@ if(shortenForm) {
     shortenForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const urlInput = document.getElementById('urlInput');
-        const originalUrl = urlInput.value;
+        const originalUrl = urlInput.value.trim();
         const btn = e.target.querySelector('button');
+
+        if(!originalUrl) return;
 
         // Loading state
         const originalBtnText = btn.innerHTML;
@@ -164,7 +173,7 @@ if(shortenForm) {
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
         try {
-            // Përdorimi i TinyURL API (pa nevojë për çelës publik)
+            // Përdorimi i TinyURL API
             const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(originalUrl)}`);
             
             if (response.ok) {
@@ -174,11 +183,11 @@ if(shortenForm) {
                 addResultToUI(originalUrl, shortUrl, true, currentDate);
                 saveLinkToStorage(originalUrl, shortUrl, currentDate);
             } else {
-                alert("Gabim gjatë shkurtimit. Ju lutem provoni përsëri.");
+                alert("Gabim gjatë shkurtimit. Ju lutem kontrolloni linkun.");
             }
         } catch (error) {
             console.error("API Error:", error);
-            alert("Lidhja dështoi. Kontrolloni internetin.");
+            alert("Lidhja dështoi. Kontrolloni internetin tuaj.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalBtnText;
@@ -226,6 +235,8 @@ function copyToClipboard(text, btn) {
             btn.innerHTML = originalHtml;
             btn.classList.replace('btn-success', 'btn-primary');
         }, 2000);
+    }).catch(err => {
+        console.error("Copy failed", err);
     });
 }
 
@@ -237,25 +248,39 @@ function generateQR(link) {
     if(!qrContainer) return;
     
     qrContainer.innerHTML = "";
-    new QRCode(qrContainer, {
-        text: link,
-        width: 180,
-        height: 180,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
-    
-    const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
-    qrModal.show();
+    // Sigurohemi që QRCode libraria është ngarkuar
+    if(typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+            text: link,
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        
+        const qrModalEl = document.getElementById('qrModal');
+        if(qrModalEl) {
+            const qrModal = new bootstrap.Modal(qrModalEl);
+            qrModal.show();
+        }
+    } else {
+        alert("Gabim: Libraria e QR Code nuk u gjet.");
+    }
 }
 
 function downloadQR() {
+    const qrCanvas = document.querySelector('#qrcode canvas');
     const qrImg = document.querySelector('#qrcode img');
-    if (qrImg) {
-        const link = document.createElement('a');
+    
+    const link = document.createElement('a');
+    link.download = 'shortenit-qr.png';
+    
+    if (qrCanvas) {
+        link.href = qrCanvas.toDataURL("image/png");
+        link.click();
+    } else if (qrImg) {
         link.href = qrImg.src;
-        link.download = 'qr-code.png';
         link.click();
     }
 }
@@ -270,21 +295,39 @@ function deleteLink(short, btn) {
         localStorage.setItem('myShortLinks', JSON.stringify(links));
         
         const item = btn.closest('.result-item');
-        item.style.opacity = '0';
-        setTimeout(() => item.remove(), 300);
+        if(item) {
+            item.style.transition = '0.3s';
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(20px)';
+            setTimeout(() => item.remove(), 300);
+        }
     }
 }
 
 function filterLinks() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
+    const searchInput = document.getElementById('searchInput');
+    if(!searchInput) return;
+    
+    const search = searchInput.value.toLowerCase();
     const items = document.querySelectorAll('.result-item');
+    
     items.forEach(item => {
         const text = item.innerText.toLowerCase();
-        item.style.setProperty('display', text.includes(search) ? 'flex' : 'none', 'important');
+        if(text.includes(search)) {
+            item.style.setProperty('display', 'flex', 'important');
+        } else {
+            item.style.setProperty('display', 'none', 'important');
+        }
     });
 }
+
+// ==========================================
+// 7. PWA - SERVICE WORKER
+// ==========================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW Registered!', reg))
+      .catch(err => console.log('SW Error:', err));
   });
 }
