@@ -1,8 +1,8 @@
-const CACHE_NAME = 'shortenit-v1.5'; // Versioni i ri për të detyruar rifreskimin e ikonës
+const CACHE_NAME = 'shortenit-v1.7'; // Versioni i ri për folderin 'pasword'
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json',
+  '/pasword/manifest.json', // RREGULLIMI: Tani te folderi pasword
   '/pasword/pasword.css',
   '/pasword/pasword.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
@@ -10,32 +10,30 @@ const urlsToCache = [
   'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
 ];
 
-// Ikona e jashtme trajtohet veçmas me 'no-cors' për siguri
+// Ikona e globit me versionim
 const ICON_URL = 'https://cdn-icons-png.flaticon.com/512/1006/1006771.png?v=4';
 
-// Instalimi: Ruajmë skedarët
+// Instalimi
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('ShortenIt SW: Duke krijuar cache-in e ri...');
-        // Provon të shtojë të gjitha resurset lokale
+        console.log('ShortenIt SW: Duke krijuar cache-in v1.7 (folderi pasword)...');
         cache.addAll(urlsToCache);
-        // Shton ikonën me Request specifik për të shmangur bllokimin CORS
         return cache.add(new Request(ICON_URL, { mode: 'no-cors' }));
       })
   );
 });
 
-// Aktivizimi: Fshijmë versionet e vjetra (Pastron ikonën e vjetër 'V')
+// Aktivizimi dhe fshirja e cache-it të vjetër
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
-            console.log('ShortenIt SW: Duke pastruar cache-in e vjetër:', cache);
+            console.log('ShortenIt SW: Duke fshirë versionin e vjetër:', cache);
             return caches.delete(cache);
           }
         })
@@ -45,17 +43,13 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// Fetch: Shërbejmë skedarët
+// Fetch
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Kthejmë nga cache ose marrim nga rrjeti
-        return response || fetch(event.request).then(fetchRes => {
-          return fetchRes;
-        });
+        return response || fetch(event.request);
       }).catch(() => {
-        // Nëse jemi offline dhe kërkohet navigim
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
