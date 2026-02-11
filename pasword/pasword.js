@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDarkModeIcon(true);
     }
 
-    // Ngarkimi i linqeve të ruajtur
+    // Ngarkimi i linqeve të ruajturi
     const savedLinks = JSON.parse(localStorage.getItem('myShortLinks')) || [];
     savedLinks.forEach(link => addResultToUI(link.original, link.short, false, link.date));
 
@@ -248,7 +248,6 @@ function generateQR(link) {
     if(!qrContainer) return;
     
     qrContainer.innerHTML = "";
-    // Sigurohemi që QRCode libraria është ngarkuar
     if(typeof QRCode !== 'undefined') {
         new QRCode(qrContainer, {
             text: link,
@@ -322,12 +321,17 @@ function filterLinks() {
 }
 
 // ==========================================
-// 7. PWA - SERVICE WORKER
+// 7. PWA - SERVICE WORKER (VERSIONIM I DETYRUAR)
 // ==========================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW Registered!', reg))
+    // Shtojmë një parametrë kohor që SW të kontrollojë gjithmonë për skedarë të rinj
+    navigator.serviceWorker.register('sw.js?v=' + Date.now())
+      .then(reg => {
+          console.log('ShortenIt SW u regjistrua!');
+          // Kontrollon për update në background
+          reg.update();
+      })
       .catch(err => console.log('SW Error:', err));
   });
 }
