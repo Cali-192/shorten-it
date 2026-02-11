@@ -1,25 +1,16 @@
 {
   "short_name": "ShortenIt",
-  "name": "ShortenIt - Shkurto Linqet",
-  "description": "Mjeti më i shpejtë për shkurtimin e URL-ve dhe gjenerimin e QR kodeve.",
+  "name": "ShortenIt - Shkurto linqet shpejt",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1006/1006771.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/1006/1006771.png",
-      "type": "image/png",
+      "src": "https://cdn-icons-png.flaticon.com/512/906/906334.png",
       "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/index.html",
-  "background_color": "#ffffff",
+  "start_url": ".",
   "display": "standalone",
-  "scope": "/",
-  "theme_color": "#2b6cb0",
-  "orientation": "portrait"
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
