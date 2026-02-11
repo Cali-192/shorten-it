@@ -4,20 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShortenIt | Shkurto linqet shpejt dhe pastër</title>
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+    
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/906/906334.png">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="pasword/pasword.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ShortenIt">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+    <meta name="theme-color" content="#0d6efd"> <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/906/906334.png">
 
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').then(reg => {
+            console.log('ShortenIt Service Worker u regjistrua me sukses!');
+          }).catch(err => {
+            console.log('Gabim në regjistrimin e SW:', err);
+          });
+        });
       }
     </script>
 </head>
@@ -318,6 +327,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-   <script src="pasword/pasword.js"></script>
+    <script src="pasword/pasword.js"></script>
 </body>
 </html>
